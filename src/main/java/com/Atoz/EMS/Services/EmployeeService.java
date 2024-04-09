@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,35 +14,38 @@ import com.Atoz.EMS.Repositories.EmployeeRepo;
 
 @Service
 public class EmployeeService {
-    @Autowired
-    private EmployeeRepo employeeRepository;
 
+    private final EmployeeRepo employeeRepository;
+    private final ModelMapper modelMapper;
     @Autowired
     private DepartmentService departmentService;
+
+    public EmployeeService(EmployeeRepo employeeRepository, ModelMapper modelMapper) {
+        this.employeeRepository = employeeRepository;
+        this.modelMapper = modelMapper;
+    }
 
     // Fetch all employees
     public List<EmployeeDTO> getAllEmployees() {
         List<Employee> employees = employeeRepository.findAll();
-        return convertToDTOs(employees);
+        return employees.stream()
+                .map(employee -> modelMapper.map(employee, EmployeeDTO.class))
+                .collect(Collectors.toList());
     }
 
     // Fetch an employee by ID
     public EmployeeDTO getEmployee(Long id) {
         Optional<Employee> optEmployee = employeeRepository.findById(id);
-        if (optEmployee.isPresent()) {
-            Employee employee = optEmployee.get();
-            return convertToDTO(employee);
-        }
-
-        return null;
+        return optEmployee.map(employee -> modelMapper.map(employee, EmployeeDTO.class))
+                .orElse(null);
     }
 
     // Insert an employee
     public EmployeeDTO addNewEmployee(EmployeeDTO dto) {
-        Employee employee = convertEmployeeDTOToEntity(dto);
+        dto.setId(null);
+        Employee employee = modelMapper.map(dto, Employee.class);
         employeeRepository.save(employee);
-        return dto;
-
+        return modelMapper.map(employee, EmployeeDTO.class);
     }
 
     // Modify the information of an employee
@@ -52,32 +56,6 @@ public class EmployeeService {
 
     public void deleteEmployee(Long id) {
         employeeRepository.deleteById(id);
-
     }
 
-    // Utility methods to convert between entity and DTO
-    private EmployeeDTO convertToDTO(Employee employee) {
-        EmployeeDTO dto = new EmployeeDTO();
-        dto.setId(employee.getId());
-        dto.setName(employee.getName());
-        dto.setPosition(employee.getPosition());
-        dto.setDepartmentId(employee.getDepartment().getId());
-        return dto;
-    }
-
-    private List<EmployeeDTO> convertToDTOs(List<Employee> employees) {
-        return employees.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    private Employee convertEmployeeDTOToEntity(EmployeeDTO dto) {
-        Employee employee = new Employee(
-                dto.getId(),
-                dto.getName(),
-                dto.getPosition(),
-                departmentService
-                        .convertDepartmentDTOToEntity(departmentService.getDepartmentById(dto.getDepartmentId())));
-        return employee;
-    }
 }

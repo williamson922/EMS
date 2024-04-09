@@ -61,6 +61,9 @@ public class DepartmentService {
 
     // Convert Data Transfer Object to Entity
     protected Department convertDepartmentDTOToEntity(DepartmentDTO dto) {
-        return new Department(dto.getId(), dto.getDepartmentName());
+        Department department = new Department();
+        department.setId(dto.getId());
+        department.setDepartmentName(dto.getDepartmentName());
+        return department;
     }
 }
