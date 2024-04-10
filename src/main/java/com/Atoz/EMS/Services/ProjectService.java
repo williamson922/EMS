@@ -1,6 +1,6 @@
 package com.Atoz.EMS.Services;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import com.Atoz.EMS.Model.DTO.ProjectDTO;
@@ -14,44 +14,31 @@ import java.util.stream.Collectors;
 @Service
 public class ProjectService {
 
-    @Autowired
-    private ProjectRepo projectRepo;
+    private final ProjectRepo projectRepo;
+    private final ModelMapper modelMapper;
 
-    private ProjectDTO convertToDTO(Project project) {
-        ProjectDTO dto = new ProjectDTO();
-        dto.setId(project.getId());
-        dto.setProjectName(project.getProjectName());
-        return dto;
-    }
-
-    private List<ProjectDTO> convertToDTOs(List<Project> projects) {
-        return projects.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-
-    private Project convertProjectDTOtoEntity(ProjectDTO dto) {
-        return new Project(dto.getId(), dto.getProjectName());
+    public ProjectService(ProjectRepo projectRepo, ModelMapper modelMapper) {
+        this.projectRepo = projectRepo;
+        this.modelMapper = modelMapper;
     }
 
     public List<ProjectDTO> getProjects() {
-        return convertToDTOs(projectRepo.findAll());
+        List<Project> projects = projectRepo.findAll();
+        return projects.stream()
+                .map(
+                        project -> modelMapper.map(project, ProjectDTO.class))
+                .collect(Collectors.toList());
     }
 
     public ProjectDTO getProject(Long id) {
         Optional<Project> optProject = projectRepo.findById(id);
-        if (optProject.isPresent()) {
-            Project project = optProject.get();
-            ProjectDTO dto = convertToDTO(project);
-            return dto;
-        }
-        return null;
+        return modelMapper.map(optProject, ProjectDTO.class);
     }
 
     public ProjectDTO addNewProject(ProjectDTO dto) {
-        Project project = convertProjectDTOtoEntity(dto);
+        Project project = modelMapper.map(dto, Project.class);
         projectRepo.save(project);
-        return dto;
+        return modelMapper.map(project, ProjectDTO.class);
     }
 
     public ProjectDTO updateProject(Long id, ProjectDTO dto) {

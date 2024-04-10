@@ -29,24 +29,4 @@ public class Project {
             @JoinColumn(name = "project_id") }, inverseJoinColumns = @JoinColumn(name = "employee_id"))
     private Set<Employee> employees = new HashSet<>();
 
-    public Project(Long id, String projectName) {
-        this.id = id;
-        this.projectName = projectName;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getProjectName() {
-        return projectName;
-    }
-
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
 }
