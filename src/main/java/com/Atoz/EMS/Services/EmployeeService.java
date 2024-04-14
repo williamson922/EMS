@@ -1,15 +1,16 @@
 package com.Atoz.EMS.Services;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.Atoz.EMS.Model.DTO.EmployeeDTO;
+import com.Atoz.EMS.Model.DTO.ProjectDTO;
 import com.Atoz.EMS.Model.Entity.Employee;
+import com.Atoz.EMS.Model.Entity.Project;
 import com.Atoz.EMS.Repositories.EmployeeRepo;
 
 @Service
@@ -17,8 +18,6 @@ public class EmployeeService {
 
     private final EmployeeRepo employeeRepository;
     private final ModelMapper modelMapper;
-    @Autowired
-    private DepartmentService departmentService;
 
     public EmployeeService(EmployeeRepo employeeRepository, ModelMapper modelMapper) {
         this.employeeRepository = employeeRepository;
@@ -35,14 +34,20 @@ public class EmployeeService {
 
     // Fetch an employee by ID
     public EmployeeDTO getEmployee(Long id) {
-        Optional<Employee> optEmployee = employeeRepository.findById(id);
-        return optEmployee.map(employee -> modelMapper.map(employee, EmployeeDTO.class))
-                .orElse(null);
+        Employee employee = employeeRepository.findById(id).get();
+
+        return modelMapper.map(employee, EmployeeDTO.class);
+    }
+
+    // Fetch the Projects which the employee assigned.
+    public Set<ProjectDTO> getProjects(Long id) {
+        Set<Project> projects = employeeRepository.findProjectsByEmployeeId(id);
+        return projects.stream().map(project -> modelMapper.map(project, ProjectDTO.class))
+                .collect(Collectors.toSet());
     }
 
     // Insert an employee
     public EmployeeDTO addNewEmployee(EmployeeDTO dto) {
-        dto.setId(null);
         Employee employee = modelMapper.map(dto, Employee.class);
         employeeRepository.save(employee);
         return modelMapper.map(employee, EmployeeDTO.class);
@@ -54,6 +59,7 @@ public class EmployeeService {
         throw new UnsupportedOperationException("Unimplemented method 'updateEmployee'");
     }
 
+    // Delete an employee
     public void deleteEmployee(Long id) {
         employeeRepository.deleteById(id);
     }

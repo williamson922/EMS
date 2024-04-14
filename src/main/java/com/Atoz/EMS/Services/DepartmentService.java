@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
+
 import org.springframework.stereotype.Service;
 
 import com.Atoz.EMS.Model.DTO.DepartmentDTO;
@@ -13,57 +14,38 @@ import com.Atoz.EMS.Repositories.DepartmentRepo;
 
 @Service
 public class DepartmentService {
-    @Autowired
-    private DepartmentRepo departmentRepository;
+
+    private final DepartmentRepo departmentRepository;
+    private final ModelMapper modelMapper;
+
+    public DepartmentService(DepartmentRepo departmentRepository, ModelMapper modelMapper) {
+        this.departmentRepository = departmentRepository;
+        this.modelMapper = modelMapper;
+    }
 
     // Fetch all departments
     public List<DepartmentDTO> getAllDepartments() {
-        return convertToDTOs(departmentRepository.findAll());
-    }
-
-    // Insert a new department
-    public DepartmentDTO addNewDepartment(DepartmentDTO dto) {
-        Department department = convertDepartmentDTOToEntity(dto);
-        departmentRepository.save(department);
-        return dto;
-    }
-
-    // Delete the department
-    public void deleteDepartment(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteDepartment'");
+        List<Department> departments = departmentRepository.findAll();
+        return departments.stream().map(department -> modelMapper.map(department, DepartmentDTO.class))
+                .collect(Collectors.toList());
     }
 
     // Fetch a department
     public DepartmentDTO getDepartmentById(Long id) {
         Optional<Department> optDepartment = departmentRepository.findById(id);
-        if (optDepartment.isPresent()) {
-            Department department = optDepartment.get();
-            return convertToDTO(department);
-        }
-        return null;
+        return modelMapper.map(optDepartment, DepartmentDTO.class);
     }
 
-    // Convert Entity to Data Transfer Object
-    private DepartmentDTO convertToDTO(Department department) {
-        DepartmentDTO dto = new DepartmentDTO(
-                department.getId(),
-                department.getDepartmentName());
-        return dto;
+    // Insert a new department
+    public DepartmentDTO addNewDepartment(DepartmentDTO dto) {
+        Department department = modelMapper.map(dto, Department.class);
+        departmentRepository.save(department);
+        return modelMapper.map(department, DepartmentDTO.class);
     }
 
-    // Convert Entity to Data Transfer Object but Collection
-    private List<DepartmentDTO> convertToDTOs(List<Department> departments) {
-        return departments.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+    // Delete the department
+    public void deleteDepartment(Long id) {
+        departmentRepository.deleteById(id);
     }
 
-    // Convert Data Transfer Object to Entity
-    protected Department convertDepartmentDTOToEntity(DepartmentDTO dto) {
-        Department department = new Department();
-        department.setId(dto.getId());
-        department.setDepartmentName(dto.getDepartmentName());
-        return department;
-    }
 }

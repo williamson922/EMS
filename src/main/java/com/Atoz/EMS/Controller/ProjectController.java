@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.Atoz.EMS.Model.DTO.EmployeeDTO;
 import com.Atoz.EMS.Model.DTO.ProjectDTO;
 import com.Atoz.EMS.Services.ProjectService;
 
@@ -34,16 +35,22 @@ public class ProjectController {
         return projectService.getProject(id);
     }
 
+    // //Fetch the list of employees who are currently assigned in the project
+    @GetMapping("/{id}/employees")
+    public List<EmployeeDTO> getEmployeeAssigned(Long id) {
+        return projectService.getEmployeeAssigned(id);
+    }
+
     // Insert a new project
-    @PostMapping
+    @PostMapping("/save")
     public ProjectDTO addNewProject(@RequestBody ProjectDTO projectDTO) {
         return projectService.addNewProject(projectDTO);
     }
 
     // Update a project
-    @PutMapping("/{id}")
-    public ProjectDTO updateProject(@PathVariable Long id, @RequestBody ProjectDTO projectDTO) {
-        return projectService.updateProject(id, projectDTO);
+    @PutMapping("/{id}/assign-employee/{empid}")
+    public ProjectDTO assignEmployee(Long employeeId, Long projectId) {
+        return projectService.assignEmployeeProject(employeeId, projectId);
     }
 
     // Delete a project

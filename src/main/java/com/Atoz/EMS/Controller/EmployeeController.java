@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Atoz.EMS.Model.DTO.EmployeeDTO;
+import com.Atoz.EMS.Model.DTO.ProjectDTO;
 import com.Atoz.EMS.Services.EmployeeService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,22 +29,26 @@ public class EmployeeController {
     }
 
     // CRUD endpoints
+    // Fetch an employee
     @GetMapping("/{id}")
-    public EmployeeDTO getEmployee(Long id) {
+    public EmployeeDTO getEmployee(@PathVariable Long id) {
         return employeeService.getEmployee(id);
     }
 
-    @PostMapping
+    // Add a new employee
+    @PostMapping("/save")
     public EmployeeDTO addNewEmployee(EmployeeDTO dto) {
         return employeeService.addNewEmployee(dto);
     }
 
+    // Edit the employee
     @PutMapping("/{id}")
     public EmployeeDTO UpdateEmployee(@PathVariable Long id, @RequestBody EmployeeDTO dto) {
         // TODO: process PUT request
         return employeeService.updateEmployee(id, dto);
     }
 
+    // Delete a employee
     @DeleteMapping("/{id}")
     public void deleteEmployee(Long id) {
         employeeService.deleteEmployee(id);
