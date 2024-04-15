@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.Atoz.EMS.Model.DTO.EmployeeDTO;
 import com.Atoz.EMS.Model.DTO.ProjectDTO;
-import com.Atoz.EMS.Model.Entity.Project;
 import com.Atoz.EMS.Services.ProjectService;
 
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,12 +35,6 @@ public class ProjectController {
         return projectService.getProject(id);
     }
 
-    // //Fetch the list of employees who are currently assigned in the project
-    @GetMapping("/{id}/employees")
-    public List<EmployeeDTO> getEmployeeAssigned(Long id) {
-        return projectService.getEmployeeAssigned(id);
-    }
-
     // Insert a new project
     @PostMapping("/save")
     public ProjectDTO addNewProject(@RequestBody ProjectDTO projectDTO) {
@@ -50,13 +43,13 @@ public class ProjectController {
 
     // Assign a employee to a project
     @PutMapping("/{id}/assign-employee")
-    public ProjectDTO assignEmployee(@RequestParam Long projectId, @RequestBody EmployeeDTO employeeDTO) {
+    public ProjectDTO assignEmployee(Long projectId, @RequestBody EmployeeDTO employeeDTO) {
         return projectService.assignEmployeeProject(projectId, employeeDTO);
     }
 
     // Update the project
     @PutMapping("/{id}")
-    public ProjectDTO putMethodName(@PathVariable Long id, @RequestBody ProjectDTO dto) {
+    public ProjectDTO updateProject(Long id, @RequestBody ProjectDTO dto) {
         return projectService.updateProject(id, dto);
     }
 

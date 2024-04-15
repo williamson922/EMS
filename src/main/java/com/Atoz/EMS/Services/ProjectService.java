@@ -39,14 +39,9 @@ public class ProjectService {
     }
 
     public ProjectDTO getProject(Long id) {
-        Project project = projectRepository.findById(id).get();
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Project does not exist : " + id));
         return modelMapper.map(project, ProjectDTO.class);
-    }
-
-    public List<EmployeeDTO> getEmployeeAssigned(Long id) {
-        Set<Employee> employees = projectRepository.findEmployeesByProjectId(id);
-        return employees.stream().map(employee -> modelMapper.map(employee, EmployeeDTO.class))
-                .collect(Collectors.toList());
     }
 
     public ProjectDTO addNewProject(ProjectDTO dto) {
@@ -57,7 +52,8 @@ public class ProjectService {
     }
 
     public ProjectDTO updateProject(Long id, ProjectDTO dto) {
-        Project project = projectRepository.findById(id).get();
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Project does not exist : " + id));
         modelMapper.map(dto, project);
         ProjectDTO updatedDto = modelMapper.map(projectRepository.save(project), ProjectDTO.class);
         return updatedDto;
@@ -69,7 +65,8 @@ public class ProjectService {
 
     public ProjectDTO assignEmployeeProject(Long projectId, EmployeeDTO employeeDTO) {
         Employee employee = modelMapper.map(employeeDTO, Employee.class);
-        Project project = projectRepository.findById(projectId).get();
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException("Project does not exist : " + projectId));
         Set<Employee> employees = project.getEmployees();
         employees.add(employee);
         project.setEmployees(employees);
