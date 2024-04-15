@@ -12,10 +12,13 @@ Before running the application, ensure you have the following installed:
 2. Navigate to the project directory
 3. Build the application using Maven with cmd "mvn clean install"
 4. Run the application with cmd "mvn spring-boot:run"
-
+## Authentication
+1. After run the application, the password will be automatically generated
+2. go to url: "https://localhost:8080/login"
 ## Usage API endpoints
 Once the application is running, you can access the following endpoints:
 prefix URL: "https://localhost/api"
+Alternatively, using the url "http://localhost:8080/swagger-ui/index.html#/" to test the APIs
 ### Employee
 1. GET /employees : Retrieve all employees
 2. GET /employees/{id} : Retrieve an employee by ID
