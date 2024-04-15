@@ -41,7 +41,8 @@ public class EmployeeService {
 
     // Fetch an employee by ID
     public EmployeeDTO getEmployee(Long id) {
-        Employee employee = employeeRepository.findById(id).get();
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Employee does not exist :" + id));
 
         return modelMapper.map(employee, EmployeeDTO.class);
     }
