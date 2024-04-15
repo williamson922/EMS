@@ -35,7 +35,7 @@ Alternatively, using the url "http://localhost:8080/swagger-ui/index.html#/" to 
 ### Project
 1. GET /projects : Retrieve all projects
 2. GET /projects/{id} : Retrieve an project by ID
-3. POST /projects : Create a new project
+3. POST /projects/save : Create a new project
 4. PUT /projects/{id} : Update the existing project
 5. PUT /projects/{id}/assign-employee : Assign an employee to a project
 6. DELETE /projects/{id} : Delete an existing project by ID
