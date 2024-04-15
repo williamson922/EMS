@@ -12,6 +12,4 @@ import com.Atoz.EMS.Model.Entity.Project;
 public interface EmployeeRepo extends JpaRepository<Employee, Long> {
     @Query("SELECT p FROM Project p JOIN p.employees e WHERE e.id = :employeeId")
     Set<Project> findProjectsByEmployeeId(@Param("employeeId") Long employeeId);
-
-    Set<Employee> findAllById(Long id);
 }

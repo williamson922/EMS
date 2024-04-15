@@ -64,12 +64,9 @@ public class EmployeeService {
     public EmployeeDTO updateEmployee(Long id, EmployeeDTO dto) {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Employee does not exist :" + id));
-        if (!dto.getDepartmentId().equals(employee.getDepartment().getId())) {
-            Department department = departmentRepository.findById(dto.getDepartmentId()).orElseThrow(
-                    () -> new EntityNotFoundException("Department does not exist : " + dto.getDepartmentId()));
-            employee.setDepartment(department);
-
-        }
+        Department department = departmentRepository.findById(dto.getDepartmentId()).orElseThrow(
+                () -> new EntityNotFoundException("Department does not exist : " + dto.getDepartmentId()));
+        employee.setDepartment(department);
         modelMapper.map(dto, employee);
         EmployeeDTO updatedDto = modelMapper.map(employeeRepository.save(employee), EmployeeDTO.class);
         return updatedDto;
@@ -78,6 +75,15 @@ public class EmployeeService {
     // Delete an employee
     public void deleteEmployee(Long id) {
         employeeRepository.deleteById(id);
+    }
+
+    public EmployeeDTO removeEmployeeFromDepartment(Long id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Employee does not exist : " + id));
+        employee.setDepartment(null);
+        employeeRepository.save(employee);
+        EmployeeDTO updatedDto = modelMapper.map(employee, EmployeeDTO.class);
+        return updatedDto;
     }
 
 }

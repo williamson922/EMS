@@ -10,8 +10,9 @@ import com.Atoz.EMS.Model.Entity.Project;
 import com.Atoz.EMS.Repositories.EmployeeRepo;
 import com.Atoz.EMS.Repositories.ProjectRepo;
 
+import jakarta.persistence.EntityNotFoundException;
+
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,10 +20,12 @@ import java.util.stream.Collectors;
 public class ProjectService {
 
     private final ProjectRepo projectRepository;
+    private final EmployeeRepo employeeRepository;
     private final ModelMapper modelMapper;
 
     public ProjectService(ProjectRepo projectRepository, EmployeeRepo employeeRepository, ModelMapper modelMapper) {
         this.projectRepository = projectRepository;
+        this.employeeRepository = employeeRepository;
         this.modelMapper = modelMapper;
 
     }
@@ -37,7 +40,6 @@ public class ProjectService {
 
     public ProjectDTO getProject(Long id) {
         Project project = projectRepository.findById(id).get();
-        System.out.println(project.getEmployees());
         return modelMapper.map(project, ProjectDTO.class);
     }
 
@@ -75,4 +77,19 @@ public class ProjectService {
         return modelMapper.map(project, ProjectDTO.class);
     }
 
+    public ProjectDTO removeEmployeeFromProject(Long id, Long empId) {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Project does not exist : " + id));
+        Set<Employee> employees = project.getEmployees();
+        Employee employee = employeeRepository.findById(empId)
+                .orElseThrow(() -> new EntityNotFoundException("Employee does not exist : " + id));
+        if (employees.contains(employee)) {
+            employees.remove(employee);
+            projectRepository.save(project);
+        } else {
+            throw new EntityNotFoundException("Employee " + empId + " is not part of project " + id);
+        }
+
+        return modelMapper.map(project, ProjectDTO.class);
+    }
 }

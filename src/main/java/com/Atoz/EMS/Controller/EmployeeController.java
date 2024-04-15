@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Atoz.EMS.Model.DTO.EmployeeDTO;
-import com.Atoz.EMS.Model.DTO.ProjectDTO;
 import com.Atoz.EMS.Services.EmployeeService;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,12 +22,13 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
+    // CRUD endpoints
+    // Fetch all employees
     @GetMapping
     public List<EmployeeDTO> getAllEmployees() {
         return employeeService.getAllEmployees();
     }
 
-    // CRUD endpoints
     // Fetch an employee
     @GetMapping("/{id}")
     public EmployeeDTO getEmployee(@PathVariable Long id) {
@@ -47,9 +47,15 @@ public class EmployeeController {
         return employeeService.updateEmployee(id, dto);
     }
 
+    // remove employee from the department
+    @DeleteMapping("/{id}/remove-department")
+    public EmployeeDTO removeEmployeeFromDepartment(@PathVariable Long id) {
+        return employeeService.removeEmployeeFromDepartment(id);
+    }
+
     // Delete a employee
     @DeleteMapping("/{id}")
-    public void deleteEmployee(Long id) {
+    public void deleteEmployee(@PathVariable Long id) {
         employeeService.deleteEmployee(id);
     }
 
