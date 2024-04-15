@@ -44,7 +44,6 @@ public class EmployeeController {
     // Edit the employee
     @PutMapping("/{id}")
     public EmployeeDTO UpdateEmployee(@PathVariable Long id, @RequestBody EmployeeDTO dto) {
-        // TODO: process PUT request
         return employeeService.updateEmployee(id, dto);
     }
 

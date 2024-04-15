@@ -1,7 +1,6 @@
 package com.Atoz.EMS.Services;
 
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
 import org.springframework.stereotype.Service;
 
 import com.Atoz.EMS.Model.DTO.EmployeeDTO;
@@ -10,8 +9,6 @@ import com.Atoz.EMS.Model.Entity.Employee;
 import com.Atoz.EMS.Model.Entity.Project;
 import com.Atoz.EMS.Repositories.EmployeeRepo;
 import com.Atoz.EMS.Repositories.ProjectRepo;
-
-import jakarta.annotation.PostConstruct;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,12 +19,10 @@ import java.util.stream.Collectors;
 public class ProjectService {
 
     private final ProjectRepo projectRepository;
-    private final EmployeeRepo employeeRepository;
     private final ModelMapper modelMapper;
 
     public ProjectService(ProjectRepo projectRepository, EmployeeRepo employeeRepository, ModelMapper modelMapper) {
         this.projectRepository = projectRepository;
-        this.employeeRepository = employeeRepository;
         this.modelMapper = modelMapper;
 
     }
@@ -41,8 +36,9 @@ public class ProjectService {
     }
 
     public ProjectDTO getProject(Long id) {
-        Optional<Project> optProject = projectRepository.findById(id);
-        return modelMapper.map(optProject, ProjectDTO.class);
+        Project project = projectRepository.findById(id).get();
+        System.out.println(project.getEmployees());
+        return modelMapper.map(project, ProjectDTO.class);
     }
 
     public List<EmployeeDTO> getEmployeeAssigned(Long id) {
@@ -53,25 +49,26 @@ public class ProjectService {
 
     public ProjectDTO addNewProject(ProjectDTO dto) {
         Project project = modelMapper.map(dto, Project.class);
-        System.out.println("New Project: " + project.toString());
         projectRepository.save(project);
         ProjectDTO projectDto = modelMapper.map(project, ProjectDTO.class);
         return projectDto;
     }
 
     public ProjectDTO updateProject(Long id, ProjectDTO dto) {
-        return null;
+        Project project = projectRepository.findById(id).get();
+        modelMapper.map(dto, project);
+        ProjectDTO updatedDto = modelMapper.map(projectRepository.save(project), ProjectDTO.class);
+        return updatedDto;
     }
 
     public void deleteProject(Long id) {
         projectRepository.deleteById(id);
     }
 
-    public ProjectDTO assignEmployeeProject(Long employeeId, Long projectId) {
-        Set<Employee> employees = null;
-        Employee employee = employeeRepository.findById(employeeId).get();
+    public ProjectDTO assignEmployeeProject(Long projectId, EmployeeDTO employeeDTO) {
+        Employee employee = modelMapper.map(employeeDTO, Employee.class);
         Project project = projectRepository.findById(projectId).get();
-        employees = project.getEmployees();
+        Set<Employee> employees = project.getEmployees();
         employees.add(employee);
         project.setEmployees(employees);
         projectRepository.save(project);

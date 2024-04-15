@@ -9,18 +9,25 @@ import org.springframework.stereotype.Service;
 
 import com.Atoz.EMS.Model.DTO.EmployeeDTO;
 import com.Atoz.EMS.Model.DTO.ProjectDTO;
+import com.Atoz.EMS.Model.Entity.Department;
 import com.Atoz.EMS.Model.Entity.Employee;
 import com.Atoz.EMS.Model.Entity.Project;
+import com.Atoz.EMS.Repositories.DepartmentRepo;
 import com.Atoz.EMS.Repositories.EmployeeRepo;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class EmployeeService {
 
     private final EmployeeRepo employeeRepository;
+    private final DepartmentRepo departmentRepository;
     private final ModelMapper modelMapper;
 
-    public EmployeeService(EmployeeRepo employeeRepository, ModelMapper modelMapper) {
+    public EmployeeService(EmployeeRepo employeeRepository, DepartmentRepo departmentRepository,
+            ModelMapper modelMapper) {
         this.employeeRepository = employeeRepository;
+        this.departmentRepository = departmentRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -55,8 +62,17 @@ public class EmployeeService {
 
     // Modify the information of an employee
     public EmployeeDTO updateEmployee(Long id, EmployeeDTO dto) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Employee does not exist :" + id));
+        if (!dto.getDepartmentId().equals(employee.getDepartment().getId())) {
+            Department department = departmentRepository.findById(dto.getDepartmentId()).orElseThrow(
+                    () -> new EntityNotFoundException("Department does not exist : " + dto.getDepartmentId()));
+            employee.setDepartment(department);
 
-        throw new UnsupportedOperationException("Unimplemented method 'updateEmployee'");
+        }
+        modelMapper.map(dto, employee);
+        EmployeeDTO updatedDto = modelMapper.map(employeeRepository.save(employee), EmployeeDTO.class);
+        return updatedDto;
     }
 
     // Delete an employee

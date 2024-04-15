@@ -48,9 +48,9 @@ public class ProjectController {
     }
 
     // Update a project
-    @PutMapping("/{id}/assign-employee/{empid}")
-    public ProjectDTO assignEmployee(Long employeeId, Long projectId) {
-        return projectService.assignEmployeeProject(employeeId, projectId);
+    @PutMapping("/{id}/assign-employee")
+    public ProjectDTO assignEmployee(@RequestParam Long projectId, @RequestBody EmployeeDTO employeeDTO) {
+        return projectService.assignEmployeeProject(projectId, employeeDTO);
     }
 
     // Delete a project
